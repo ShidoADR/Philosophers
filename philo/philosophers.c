@@ -1,7 +1,11 @@
-#include "headers/philosphers.h"
+#include "headers/philosophers.h"
 
-int	main(void)
+int	main(int ac, char *av[])
 {
-	printf ("Hello World!\n");
+	if (check_error(ac, av) == TRUE)
+	{
+		printf ("%sError!\n%s", RED, RESET);
+		return (1);
+	}
 	return (0);
 }
