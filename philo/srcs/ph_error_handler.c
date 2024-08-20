@@ -1,6 +1,6 @@
 #include "../headers/philosophers.h"
 
-int	is_numeric(char *number)
+t_bool	is_numeric(char *number)
 {
 	int	i;
 
@@ -16,7 +16,7 @@ int	is_numeric(char *number)
 	return (TRUE);
 }
 
-int	check_error(int ac, char *av[])
+t_bool	check_error(int ac, char *av[])
 {
 	int	i;
 
