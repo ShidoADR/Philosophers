@@ -25,12 +25,27 @@ t_bool	dead_body_detected(t_data *table)
 
 void	print_action(short id, char *message, t_data *table)
 {
+	t_bool		status;
+	long long	timestamp;
+
+	usleep(10);
+	pthread_mutex_lock (&table->death_lock);
+	status = table->is_dead;
+	pthread_mutex_unlock (&table->death_lock);
+	pthread_mutex_lock (&table->write_lock);
+	timestamp = ph_get_current_time () - table->time_to_start;
+	if (status == FALSE)
+		printf ("%lld %hd %s\n", timestamp, id, message);
+	pthread_mutex_unlock (&table->write_lock);
+}
+
+void	print_death(short id, t_data *table)
+{
 	long long	timestamp;
 
 	pthread_mutex_lock (&table->write_lock);
 	timestamp = ph_get_current_time () - table->time_to_start;
-	if (dead_body_detected (table) == FALSE)
-		printf ("%lld %hd %s\n", timestamp, id, message);
+	printf ("%lld %hd died\n", timestamp, id);
 	pthread_mutex_unlock (&table->write_lock);
 }
 
@@ -38,14 +53,14 @@ t_bool	is_deceased(t_data *table, t_philo *ph)
 {
 	long long	time_remaining;
 
-	pthread_mutex_lock(&table->check_lock);
+	pthread_mutex_lock (&table->check_lock);
 	time_remaining = ph_get_current_time() - ph->last_meal;
 	if (time_remaining >= table->time_to_die && ph->eating == TRUE)
 	{
-		pthread_mutex_unlock(&table->check_lock);
+		pthread_mutex_unlock (&table->check_lock);
 		return (TRUE);
 	}
-	pthread_mutex_unlock(&table->check_lock);
+	pthread_mutex_unlock (&table->check_lock);
 	return (FALSE);
 }
 
@@ -61,7 +76,7 @@ t_bool	check_death(t_data *table)
 		if (is_deceased(table, &table->philosopher[i]) == TRUE)
 		{
 			pthread_mutex_lock (&table->death_lock);
-			print_action (table->philosopher[i].fork, "died", table);
+			print_death (table->philosopher[i].fork, table);
 			table->is_dead = TRUE;
 			pthread_mutex_unlock (&table->death_lock);
 			return (TRUE);
@@ -91,7 +106,7 @@ t_bool	check_eaten(t_data *table)
 	if (count_finish_eating == table->n_philosophers)
 	{
 		pthread_mutex_lock (&table->death_lock);
-		table->is_dead = 1;
+		table->is_dead = TRUE;
 		pthread_mutex_unlock (&table->death_lock);
 		return (TRUE);
 	}
@@ -139,13 +154,12 @@ void	ph_usleep(long long time)
 
 	start_time = ph_get_current_time ();
 	while ((ph_get_current_time() - start_time) < time)
-		usleep (500);
+		usleep (100);
 }
 
 void	rt_think(t_data *table, t_philo *ph)
 {
 	print_action(ph->fork, "is thinking", table);
-	usleep(500);
 }
 
 void	rt_sleep(t_data *table, t_philo *ph)
@@ -156,7 +170,7 @@ void	rt_sleep(t_data *table, t_philo *ph)
 
 void	ph_take_fork(t_philo *ph)
 {
-	if (ph->fork % 2 == 0)
+	if (ph->fork % 2 != 0)
 	{
 		pthread_mutex_lock (&ph->data->fork_lock[ph->r_fork_id]);
 		print_action (ph->fork, "has taken a fork", ph->data);
@@ -174,7 +188,7 @@ void	ph_take_fork(t_philo *ph)
 
 void	ph_drop_fork(t_philo *ph)
 {
-	if (ph->fork % 2 != 0)
+	if (ph->fork % 2 == 0)
 	{
 		pthread_mutex_unlock (&ph->data->fork_lock[ph->r_fork_id]);
 		pthread_mutex_unlock (&ph->data->fork_lock[ph->l_fork_id]);
@@ -191,14 +205,18 @@ void	rt_eat(t_data *table, t_philo *ph)
 	if (ph->data->n_philosophers == 1)
 		return ;
 	ph_take_fork(ph);
+	pthread_mutex_lock (&table->check_lock);
 	ph->eating = TRUE;
+	pthread_mutex_unlock (&table->check_lock);
 	print_action (ph->fork, "is eating", table);
 	pthread_mutex_lock (&table->check_lock);
 	ph->last_meal = ph_get_current_time ();
 	ph->meal_eaten ++;
 	pthread_mutex_unlock (&table->check_lock);
 	ph_usleep (table->time_to_eat);
+	pthread_mutex_lock (&table->check_lock);
 	ph->eating = FALSE;
+	pthread_mutex_unlock (&table->check_lock);
 	ph_drop_fork(ph);
 }
 
@@ -249,13 +267,12 @@ void	ph_mutex_init(t_data *table)
 void	*observe(void *data)
 {
 	t_data		*table;
+	long long	counter;
 
 	table = (t_data *)data;
-	while (1)
-	{
-		if (check_death (data) == TRUE || check_eaten (data) == TRUE)
-			break ;
-	}
+	counter = 0;
+	while (check_death (data) == FALSE && check_eaten (data) == FALSE)
+		counter ++;
 	return (NULL);
 }
 
