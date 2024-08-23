@@ -1,7 +1,4 @@
 #include "headers/philosophers.h"
-#include "headers/struct.h"
-#include <pthread.h>
-#include <unistd.h>
 
 long long	ph_get_current_time(void)
 {
@@ -35,7 +32,11 @@ void	print_action(short id, char *message, t_data *table)
 	pthread_mutex_lock (&table->write_lock);
 	timestamp = ph_get_current_time () - table->time_to_start;
 	if (status == FALSE)
-		printf ("%lld %hd %s\n", timestamp, id, message);
+	{
+		printf ("%s%lld%s", YELLOW, timestamp, RESET);
+		printf (" %hd", id);
+		printf (" %s%s%s\n", GREEN, message, RESET);
+	}
 	pthread_mutex_unlock (&table->write_lock);
 }
 
@@ -45,7 +46,9 @@ void	print_death(short id, t_data *table)
 
 	pthread_mutex_lock (&table->write_lock);
 	timestamp = ph_get_current_time () - table->time_to_start;
-	printf ("%lld %hd died\n", timestamp, id);
+	printf ("%s", RED);
+	printf ("%lld %hd died\n", ph_get_current_time () - table->time_to_start, id);
+	printf ("%s", RESET);
 	pthread_mutex_unlock (&table->write_lock);
 }
 
@@ -55,7 +58,7 @@ t_bool	is_deceased(t_data *table, t_philo *ph)
 
 	pthread_mutex_lock (&table->check_lock);
 	time_remaining = ph_get_current_time() - ph->last_meal;
-	if (time_remaining >= table->time_to_die && ph->eating == TRUE)
+	if (time_remaining >= table->time_to_die && ph->eating == FALSE)
 	{
 		pthread_mutex_unlock (&table->check_lock);
 		return (TRUE);
@@ -113,6 +116,21 @@ t_bool	check_eaten(t_data *table)
 	return (FALSE);
 }
 
+void	ph_mutex_init(t_data *table)
+{
+	short	i;
+
+	i = 0;
+	pthread_mutex_init(&(table->death_lock), NULL);
+	pthread_mutex_init(&(table->write_lock), NULL);
+	pthread_mutex_init(&(table->check_lock), NULL);
+	while (i < table->n_philosophers)
+	{
+		pthread_mutex_init(&(table->fork_lock[i]), NULL);
+		i++;
+	}
+}
+
 void	ph_init_data(int ac, char *av[], t_data *table)
 {
 	table->n_philosophers = ft_atol (av[1]);
@@ -146,6 +164,7 @@ void	ph_init_philo(int ac, char *av[], t_data *table)
 		table->philosopher[i].eating = FALSE;
 		i++;
 	}
+	ph_mutex_init(table);
 }
 
 void	ph_usleep(long long time)
@@ -249,21 +268,6 @@ void	ph_mutex_destroy(t_data *table)
 	}
 }
 
-void	ph_mutex_init(t_data *table)
-{
-	short	i;
-
-	i = 0;
-	pthread_mutex_init(&(table->death_lock), NULL);
-	pthread_mutex_init(&(table->write_lock), NULL);
-	pthread_mutex_init(&(table->check_lock), NULL);
-	while (i < table->n_philosophers)
-	{
-		pthread_mutex_init(&(table->fork_lock[i]), NULL);
-		i++;
-	}
-}
-
 void	*observe(void *data)
 {
 	t_data		*table;
@@ -285,9 +289,15 @@ void	ph_routine(t_data *table)
 {
 	int	i;
 
-	i = 0;
-	ph_mutex_init(table);
 	monitoring(table);
+	i = 0;
+	while (i < table->n_philosophers)
+	{
+		ph_usleep(1);
+		i++;
+	}
+	table->time_to_start = ph_get_current_time();
+	i = 0;
 	while (i < table->n_philosophers)
 	{
 		pthread_create (&(table->philosopher[i].thread), NULL, philosophize, &table->philosopher[i]);
