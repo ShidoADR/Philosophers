@@ -27,3 +27,20 @@ long	ft_atol(const char *nptr)
 	}
 	return (sign * result);
 }
+
+long long	ph_get_current_time(void)
+{
+	struct timeval	tv;
+
+	gettimeofday (&tv, NULL);
+	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+}
+
+void	ph_usleep(long long time)
+{
+	long long	start_time;
+
+	start_time = ph_get_current_time ();
+	while ((ph_get_current_time() - start_time) < time)
+		usleep (100);
+}

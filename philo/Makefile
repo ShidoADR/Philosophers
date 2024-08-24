@@ -8,7 +8,7 @@ INCLUDE = -I headers/
 
 MAIN = philosophers.c
 
-SRCS = $(MAIN) $(addprefix srcs/, ph_error_handler.c ph_lib.c)
+SRCS = $(MAIN) $(addprefix srcs/, ph_error_handler.c ph_init_data.c ph_lib.c ph_monitor.c ph_mutex_utils.c ph_print.c ph_routine.c ph_thread_utils.c rt_eat.c rt_sleep_think.c)
 
 OBJS_DIR = objs
 

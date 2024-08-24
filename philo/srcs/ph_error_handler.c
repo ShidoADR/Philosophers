@@ -1,5 +1,22 @@
 #include "../headers/philosophers.h"
 
+t_error_flag	is_valid_arguments(int ac, char *av[], t_data *table)
+{
+	if (check_error (ac, av) == TRUE)
+		return (INPUT_VALUE);
+	if (table->n_philosophers <= 0 || table->n_philosophers > 200)
+		return (PHILO_NUMBER);
+	if (table->time_to_die <= 0)
+		return (ARG_VALUE);
+	if (table->time_to_eat <= 0)
+		return (ARG_VALUE);
+	if (table->time_to_sleep <= 0)
+		return (ARG_VALUE);
+	if (ac == 6 && table->n_philosophers <= 0)
+		return (ARG_VALUE);
+	return (TRUE);
+}
+
 t_bool	is_numeric(char *number)
 {
 	int	i;
