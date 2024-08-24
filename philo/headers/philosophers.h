@@ -10,6 +10,9 @@
 
 # define TRUE 1
 # define FALSE 0
+# define PHILO_NUMBER -1
+# define ARG_VALUE -2
+# define INPUT_VALUE -3
 
 t_bool	is_numeric(char *number);
 t_bool	check_error(int ac, char *av[]);

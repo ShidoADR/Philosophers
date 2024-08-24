@@ -47,7 +47,7 @@ void	print_death(short id, t_data *table)
 	pthread_mutex_lock (&table->write_lock);
 	timestamp = ph_get_current_time () - table->time_to_start;
 	printf ("%s", RED);
-	printf ("%lld %hd died\n", ph_get_current_time () - table->time_to_start, id);
+	printf ("%lld %hd died\n", timestamp, id);
 	printf ("%s", RESET);
 	pthread_mutex_unlock (&table->write_lock);
 }
@@ -131,12 +131,29 @@ void	ph_mutex_init(t_data *table)
 	}
 }
 
+t_error_flag	is_valid_arguments(int ac, char *av[], t_data *table)
+{
+	if (check_error (ac, av) == TRUE)
+		return (INPUT_VALUE);
+	if (table->n_philosophers <= 0 || table->n_philosophers > 200)
+		return (PHILO_NUMBER);
+	if (table->time_to_die <= 0)
+		return (ARG_VALUE);
+	if (table->time_to_eat <= 0)
+		return (ARG_VALUE);
+	if (table->time_to_sleep <= 0)
+		return (ARG_VALUE);
+	if (ac == 6 && table->n_philosophers <= 0)
+		return (ARG_VALUE);
+	return (TRUE);
+}
+
 void	ph_init_data(int ac, char *av[], t_data *table)
 {
 	table->n_philosophers = ft_atol (av[1]);
 	table->time_to_die = ft_atol (av[2]);
 	table->time_to_eat = ft_atol (av[3]);
-	table->time_to_sleep = ft_atol(av[4]);
+	table->time_to_sleep = ft_atol (av[4]);
 	table->n_must_eat = -1;
 	table->time_to_start = ph_get_current_time();
 	table->is_dead = FALSE;
@@ -145,12 +162,39 @@ void	ph_init_data(int ac, char *av[], t_data *table)
 		table->n_must_eat = ft_atol (av[5]);
 }
 
-void	ph_init_philo(int ac, char *av[], t_data *table)
+void	print_error(t_error_flag flag)
+{
+	if (flag == PHILO_NUMBER)
+	{
+		printf ("%sError : ", RED);
+		printf ("number of philosophers must be in range of 1 and 200");
+		printf ("\n%s", RESET);
+	}
+	if (flag == ARG_VALUE)
+	{
+		printf ("%sError : ", RED);
+		printf ("bad arguments value");
+		printf ("\n%s", RESET);
+	}
+	if (flag == INPUT_VALUE)
+	{
+		printf ("%sError : ", RED);
+		printf ("bad input (digit value only)");
+		printf ("\n%s", RESET);
+	}
+}
+
+t_bool	ph_init_philo(int ac, char *av[], t_data *table)
 {
 	int		i;
 	short	n;
 
 	ph_init_data(ac, av, table);
+	if (is_valid_arguments (ac, av, table) <= 0)
+	{
+		print_error (is_valid_arguments (ac, av, table));
+		return (FALSE);
+	}
 	i = 0;
 	n = table->n_philosophers;
 	while (i < n)
@@ -165,6 +209,7 @@ void	ph_init_philo(int ac, char *av[], t_data *table)
 		i++;
 	}
 	ph_mutex_init(table);
+	return (TRUE);
 }
 
 void	ph_usleep(long long time)
@@ -179,6 +224,7 @@ void	ph_usleep(long long time)
 void	rt_think(t_data *table, t_philo *ph)
 {
 	print_action(ph->fork, "is thinking", table);
+	ph_usleep (100);
 }
 
 void	rt_sleep(t_data *table, t_philo *ph)
@@ -275,7 +321,7 @@ void	*observe(void *data)
 
 	table = (t_data *)data;
 	counter = 0;
-	while (check_death (data) == FALSE && check_eaten (data) == FALSE)
+	while (check_death (table) == FALSE && check_eaten (table) == FALSE)
 		counter ++;
 	return (NULL);
 }
@@ -285,31 +331,52 @@ void	monitoring(t_data *table)
 	pthread_create(&(table->monitor), NULL, observe, table);
 }
 
-void	ph_routine(t_data *table)
+void	start_routine(t_data *t)
+{
+	int		i;
+	t_philo	*ph;
+
+	i = 0;
+	while (i < t->n_philosophers)
+	{
+		ph = &t->philosopher[i];
+		pthread_create (&(ph->thread), NULL, philosophize, &(*ph));
+		i ++;
+	}
+}
+
+void	get_start_time(t_data *table)
 {
 	int	i;
 
-	monitoring(table);
 	i = 0;
 	while (i < table->n_philosophers)
 	{
-		ph_usleep(1);
+		ph_usleep (1);
 		i++;
 	}
-	table->time_to_start = ph_get_current_time();
+	table->time_to_start = ph_get_current_time ();
+}
+
+void	ph_join_thread(t_data *table)
+{
+	int	i;
+
+	pthread_join (table->monitor, NULL);
 	i = 0;
-	while (i < table->n_philosophers)
-	{
-		pthread_create (&(table->philosopher[i].thread), NULL, philosophize, &table->philosopher[i]);
-		i++;
-	}
-	i = 0;
-	pthread_join(table->monitor, NULL);
 	while (i < table->n_philosophers)
 	{
 		pthread_join (table->philosopher[i].thread, NULL);
 		i++;
 	}
+}
+
+void	ph_routine(t_data *table)
+{
+	monitoring (table);
+	get_start_time (table);
+	start_routine (table);
+	ph_join_thread (table);
 	ph_mutex_destroy (table);
 }
 
@@ -317,12 +384,8 @@ int	main(int ac, char *av[])
 {
 	t_data	table;
 
-	if (check_error(ac, av) == TRUE)
-	{
-		printf ("%sError!\n%s", RED, RESET);
+	if (ph_init_philo (ac, av, &table) == FALSE)
 		return (1);
-	}
-	ph_init_philo (ac, av, &table);
 	ph_routine (&table);
 	return (0);
 }

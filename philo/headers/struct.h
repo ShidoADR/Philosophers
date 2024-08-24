@@ -1,11 +1,11 @@
 #ifndef STRUCT_H
 # define STRUCT_H
 
-#include <bits/pthreadtypes.h>
 # include <pthread.h>
 
-typedef int	t_bool;
-typedef struct s_data t_data;
+typedef int				t_bool;
+typedef int				t_error_flag;
+typedef struct s_data	t_data;
 
 typedef struct s_philo
 {
