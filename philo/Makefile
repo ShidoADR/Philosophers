@@ -2,7 +2,7 @@ NAME = philo
 
 CC = cc
 
-FLAGS = -Wall -Wextra -Werror -g -g3
+FLAGS = -Wall -Wextra -Werror -g -g3 -lpthread
 
 INCLUDE = -I headers/
 

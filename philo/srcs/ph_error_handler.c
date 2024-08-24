@@ -2,7 +2,9 @@
 
 t_error_flag	is_valid_arguments(int ac, char *av[], t_data *table)
 {
-	if (check_error (ac, av) == TRUE)
+	if (ac < 5 || ac > 6)
+		return (ARG_NUMBER);
+	if (check_error (av) == TRUE)
 		return (INPUT_VALUE);
 	if (table->n_philosophers <= 0 || table->n_philosophers > 200)
 		return (PHILO_NUMBER);
@@ -33,16 +35,14 @@ t_bool	is_numeric(char *number)
 	return (TRUE);
 }
 
-t_bool	check_error(int ac, char *av[])
+t_bool	check_error(char *av[])
 {
 	int	i;
 
-	if (ac < 5 || ac > 6)
-		return (TRUE);
 	i = 1;
 	while (av[i] != NULL)
 	{
-		if (is_numeric(av[i]) == FALSE)
+		if (is_numeric (av[i]) == FALSE)
 			return (TRUE);
 		i++;
 	}

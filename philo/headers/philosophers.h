@@ -13,12 +13,13 @@
 # define PHILO_NUMBER -1
 # define ARG_VALUE -2
 # define INPUT_VALUE -3
+# define ARG_NUMBER -4
 
 /*
 ** file == srcs/ph_error_handler.c
 */
 t_bool			is_numeric(char *number);
-t_bool			check_error(int ac, char *av[]);
+t_bool			check_error(char *av[]);
 t_error_flag	is_valid_arguments(int ac, char *av[], t_data *table);
 
 /*

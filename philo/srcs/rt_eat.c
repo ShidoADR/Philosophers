@@ -1,5 +1,19 @@
 #include "../headers/philosophers.h"
 
+t_bool	is_full(t_philo *ph)
+{
+	int	meal_eaten;
+
+	if (ph->data->n_must_eat == -1)
+		return (FALSE);
+	pthread_mutex_lock (&ph->data->check_lock);
+	meal_eaten = ph->meal_eaten;
+	pthread_mutex_unlock (&ph->data->check_lock);
+	if (meal_eaten >= ph->data->n_must_eat)
+		return (TRUE);
+	return (FALSE);
+}
+
 void	ph_take_fork(t_philo *ph)
 {
 	if (ph->fork % 2 != 0)
@@ -35,7 +49,13 @@ void	ph_drop_fork(t_philo *ph)
 void	rt_eat(t_data *table, t_philo *ph)
 {
 	if (ph->data->n_philosophers == 1)
+	{
+		pthread_mutex_lock (&ph->data->fork_lock[ph->l_fork_id]);
+		print_action (ph->fork, "has taken a fork", ph->data);
+		pthread_mutex_unlock (&ph->data->fork_lock[ph->l_fork_id]);
+		ph_usleep (table->time_to_die);
 		return ;
+	}
 	ph_take_fork(ph);
 	pthread_mutex_lock (&table->check_lock);
 	ph->eating = TRUE;

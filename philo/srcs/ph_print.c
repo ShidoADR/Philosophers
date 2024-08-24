@@ -37,19 +37,26 @@ void	print_error(t_error_flag flag)
 	if (flag == PHILO_NUMBER)
 	{
 		printf ("%sError : ", RED);
-		printf ("number of philosophers must be in range of 1 and 200");
+		printf ("number of philosophers must be in range of 1 to 200");
 		printf ("\n%s", RESET);
 	}
 	if (flag == ARG_VALUE)
 	{
 		printf ("%sError : ", RED);
-		printf ("bad arguments value");
+		printf ("bad arguments value (must exceed 0)");
 		printf ("\n%s", RESET);
 	}
 	if (flag == INPUT_VALUE)
 	{
 		printf ("%sError : ", RED);
 		printf ("bad input (digit value only)");
+		printf ("\n%s", RESET);
+	}
+	if (flag == ARG_NUMBER)
+	{
+		printf ("%sError : ", RED);
+		printf ("bad input (./philo time_to_die time_to_eat");
+		printf (" time_to_sleep [n_must_eat])");
 		printf ("\n%s", RESET);
 	}
 }
