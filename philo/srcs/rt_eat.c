@@ -52,8 +52,8 @@ void	rt_eat(t_data *table, t_philo *ph)
 	{
 		pthread_mutex_lock (&ph->data->fork_lock[ph->l_fork_id]);
 		print_action (ph->fork, "has taken a fork", ph->data);
+		ph_usleep (table->time_to_die, ph->data);
 		pthread_mutex_unlock (&ph->data->fork_lock[ph->l_fork_id]);
-		ph_usleep (table->time_to_die);
 		return ;
 	}
 	ph_take_fork(ph);
@@ -65,7 +65,7 @@ void	rt_eat(t_data *table, t_philo *ph)
 	ph->last_meal = ph_get_current_time ();
 	ph->meal_eaten ++;
 	pthread_mutex_unlock (&table->check_lock);
-	ph_usleep (table->time_to_eat);
+	ph_usleep (table->time_to_eat, ph->data);
 	pthread_mutex_lock (&table->check_lock);
 	ph->eating = FALSE;
 	pthread_mutex_unlock (&table->check_lock);

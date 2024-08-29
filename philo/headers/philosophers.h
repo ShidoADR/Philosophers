@@ -33,7 +33,7 @@ t_bool			ph_init_philo(int ac, char *av[], t_data *table);
 */
 long			ft_atol(const char *nptr);
 long long		ph_get_current_time(void);
-void			ph_usleep(long long time);
+void			ph_usleep(long long time, t_data *table);
 
 /*
 ** file == srcs/ph_monitor.c

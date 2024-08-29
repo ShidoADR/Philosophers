@@ -1,4 +1,5 @@
 #include "../headers/philosophers.h"
+#include <pthread.h>
 
 void	*philosophize(void *data)
 {
@@ -7,9 +8,9 @@ void	*philosophize(void *data)
 	ph = (t_philo *)data;
 	while (dead_body_detected (ph->data) == FALSE)
 	{
-		rt_eat(ph->data, ph);
-		rt_sleep(ph->data, ph);
-		rt_think(ph->data, ph);
+		rt_eat (ph->data, ph);
+		rt_sleep (ph->data, ph);
+		rt_think (ph->data, ph);
 	}
 	return (NULL);
 }
@@ -35,10 +36,18 @@ void	get_start_time(t_data *table)
 	i = 0;
 	while (i < table->n_philosophers)
 	{
-		ph_usleep (1);
+		ph_usleep (1, table);
 		i++;
 	}
 	table->time_to_start = ph_get_current_time ();
+	i = 0;
+	while (i < table->n_philosophers)
+	{
+		pthread_mutex_lock (&table->check_lock);
+		table->philosopher[i].last_meal = table->time_to_start;
+		pthread_mutex_unlock (&table->check_lock);
+		i++;
+	}
 }
 
 void	ph_routine(t_data *table)

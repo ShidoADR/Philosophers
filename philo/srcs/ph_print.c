@@ -5,7 +5,7 @@ void	print_action(short id, char *message, t_data *table)
 	t_bool		status;
 	long long	timestamp;
 
-	usleep(10);
+	usleep (10);
 	pthread_mutex_lock (&table->death_lock);
 	status = table->is_dead;
 	pthread_mutex_unlock (&table->death_lock);

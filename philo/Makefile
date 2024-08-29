@@ -2,7 +2,7 @@ NAME = philo
 
 CC = cc
 
-FLAGS = -Wall -Wextra -Werror -g -g3 -lpthread
+FLAGS = -Wall -Wextra -Werror -g
 
 INCLUDE = -I headers/
 
@@ -21,7 +21,7 @@ $(OBJS_DIR)/%.o : %.c
 	@ $(CC) $(FLAGS) -I/usr/include -c $< -o $@ $(INCLUDE)
 
 $(NAME) : $(OBJS)
-	@ $(CC) $(FLAGS) $(OBJS) -o $(NAME) $(INCLUDE)
+	@ $(CC) $(FLAGS) $(OBJS) -lpthread -o $(NAME) $(INCLUDE)
 	@ echo "\e[0;32mBuild success!\e[0m"
 
 clean :

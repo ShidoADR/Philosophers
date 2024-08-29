@@ -1,4 +1,5 @@
 #include "../headers/philosophers.h"
+#include <unistd.h>
 
 t_bool	check_death(t_data *table)
 {
@@ -19,6 +20,7 @@ t_bool	check_death(t_data *table)
 		}
 		i++;
 	}
+	usleep (1);
 	return (FALSE);
 }
 
@@ -46,6 +48,7 @@ t_bool	check_eaten(t_data *table)
 		pthread_mutex_unlock (&table->death_lock);
 		return (TRUE);
 	}
+	usleep (1);
 	return (FALSE);
 }
 

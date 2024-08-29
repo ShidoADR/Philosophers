@@ -1,4 +1,5 @@
 #include "../headers/philosophers.h"
+#include <pthread.h>
 
 long	ft_atol(const char *nptr)
 {
@@ -36,11 +37,15 @@ long long	ph_get_current_time(void)
 	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
-void	ph_usleep(long long time)
+void	ph_usleep(long long time, t_data *table)
 {
 	long long	start_time;
 
 	start_time = ph_get_current_time ();
 	while ((ph_get_current_time() - start_time) < time)
+	{
+		if (dead_body_detected (table) == TRUE)
+			break ;
 		usleep (100);
+	}
 }
