@@ -1,11 +1,16 @@
 #include "../headers/philosophers.h"
-#include <pthread.h>
+#include <unistd.h>
 
 void	*philosophize(void *data)
 {
 	t_philo	*ph;
 
 	ph = (t_philo *)data;
+	if (ph->id % 2 == 0)
+		usleep (500);
+	pthread_mutex_lock (&ph->data->check_lock);
+	ph->last_meal = ph_get_current_time();
+	pthread_mutex_unlock (&ph->data->check_lock);
 	while (dead_body_detected (ph->data) == FALSE)
 	{
 		rt_eat (ph->data, ph);
@@ -36,7 +41,7 @@ void	get_start_time(t_data *table)
 	i = 0;
 	while (i < table->n_philosophers)
 	{
-		ph_usleep (1, table);
+		ph_usleep (5, table);
 		i++;
 	}
 	table->time_to_start = ph_get_current_time ();
@@ -53,7 +58,6 @@ void	get_start_time(t_data *table)
 void	ph_routine(t_data *table)
 {
 	monitoring (table);
-	get_start_time (table);
 	start_routine (table);
 	ph_join_thread (table);
 	ph_mutex_destroy (table);

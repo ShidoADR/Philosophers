@@ -16,8 +16,8 @@ void	ph_init_data(int ac, char *av[], t_data *table)
 
 t_bool	ph_init_philo(int ac, char *av[], t_data *table)
 {
-	int		i;
-	short	n;
+	int	i;
+	int	n;
 
 	ph_init_data(ac, av, table);
 	if (is_valid_arguments (ac, av, table) <= 0)
@@ -30,7 +30,8 @@ t_bool	ph_init_philo(int ac, char *av[], t_data *table)
 	while (i < n)
 	{
 		table->philosopher[i].data = table;
-		table->philosopher[i].fork = i + 1;
+		table->philosopher[i].fork = FREE;
+		table->philosopher[i].id = i + 1;
 		table->philosopher[i].last_meal = table->time_to_start;
 		table->philosopher[i].meal_eaten = 0;
 		table->philosopher[i].l_fork_id = i;
@@ -38,6 +39,6 @@ t_bool	ph_init_philo(int ac, char *av[], t_data *table)
 		table->philosopher[i].eating = FALSE;
 		i++;
 	}
-	ph_mutex_init(table);
+	ph_mutex_init (table);
 	return (TRUE);
 }

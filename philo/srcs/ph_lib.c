@@ -46,6 +46,6 @@ void	ph_usleep(long long time, t_data *table)
 	{
 		if (dead_body_detected (table) == TRUE)
 			break ;
-		usleep (100);
+		usleep (500);
 	}
 }

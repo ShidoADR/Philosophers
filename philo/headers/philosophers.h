@@ -8,6 +8,8 @@
 # include "color.h"
 # include "struct.h"
 
+# define FREE 3
+# define IN_USE 2
 # define TRUE 1
 # define FALSE 0
 # define PHILO_NUMBER -1
