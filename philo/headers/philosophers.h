@@ -63,7 +63,6 @@ void			print_error(t_error_flag flag);
 */
 void			*philosophize(void *data);
 void			start_routine(t_data *t);
-void			get_start_time(t_data *table);
 void			ph_routine(t_data *table);
 
 /*

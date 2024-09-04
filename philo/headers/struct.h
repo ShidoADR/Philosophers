@@ -26,7 +26,7 @@ typedef struct s_philo
 struct s_data
 {
 	int				n_must_eat;
-	int			n_philosophers;
+	int				n_philosophers;
 	long			time_to_die;
 	long			time_to_sleep;
 	long			time_to_eat;

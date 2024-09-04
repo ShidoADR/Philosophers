@@ -35,10 +35,7 @@ void	change_fork_state(t_philo *ph, t_bool value)
 void	wait_fork(t_philo *ph)
 {
 	while (fork_state (ph) == IN_USE && dead_body_detected (ph->data) == FALSE)
-	{
 		usleep (1);
-		wait_fork (ph);
-	}
 }
 
 void	ph_take_r_fork(t_philo *ph)
@@ -55,6 +52,7 @@ void	ph_take_r_fork(t_philo *ph)
 	change_fork_state (left_ph, IN_USE);
 	print_action (ph->id, "has taken a fork", ph->data);
 }
+
 void	ph_take_l_fork(t_philo *ph)
 {
 	t_philo	*left_ph;

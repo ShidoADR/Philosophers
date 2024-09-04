@@ -34,27 +34,6 @@ void	start_routine(t_data *t)
 	}
 }
 
-void	get_start_time(t_data *table)
-{
-	int	i;
-
-	i = 0;
-	while (i < table->n_philosophers)
-	{
-		ph_usleep (5, table);
-		i++;
-	}
-	table->time_to_start = ph_get_current_time ();
-	i = 0;
-	while (i < table->n_philosophers)
-	{
-		pthread_mutex_lock (&table->check_lock);
-		table->philosopher[i].last_meal = table->time_to_start;
-		pthread_mutex_unlock (&table->check_lock);
-		i++;
-	}
-}
-
 void	ph_routine(t_data *table)
 {
 	monitoring (table);
