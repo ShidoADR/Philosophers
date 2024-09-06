@@ -25,7 +25,8 @@ void	ph_mutex_destroy(t_data *table)
 	pthread_mutex_destroy (&(table->check_lock));
 	while (i < table->n_philosophers)
 	{
-		pthread_mutex_init (&(table->philosopher[i].fork_lock), NULL);
+		pthread_mutex_destroy (&(table->philosopher[i].fork_lock));
 		i++;
 	}
+	free (table->philosopher);
 }

@@ -1,5 +1,18 @@
 #include "../headers/philosophers.h"
-#include <unistd.h>
+
+t_bool	is_full(t_philo *ph)
+{
+	int	meal_eaten;
+
+	if (ph->data->n_must_eat == -1)
+		return (FALSE);
+	pthread_mutex_lock (&ph->data->check_lock);
+	meal_eaten = ph->meal_eaten;
+	pthread_mutex_unlock (&ph->data->check_lock);
+	if (meal_eaten >= ph->data->n_must_eat)
+		return (TRUE);
+	return (FALSE);
+}
 
 void	*philosophize(void *data)
 {

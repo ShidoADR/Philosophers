@@ -34,7 +34,7 @@ struct s_data
 	t_bool			is_all_eaten;
 	long long		time_to_start;
 	pthread_t		monitor;
-	struct s_philo	philosopher[200];
+	struct s_philo	*philosopher;
 	pthread_mutex_t	write_lock;
 	pthread_mutex_t	death_lock;
 	pthread_mutex_t	check_lock;

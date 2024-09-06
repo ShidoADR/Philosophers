@@ -28,6 +28,7 @@ t_error_flag	is_valid_arguments(int ac, char *av[], t_data *table);
 ** file == srcs/ph_init_data.c
 */
 void			ph_init_data(int ac, char *av[], t_data *table);
+t_bool			alloc_philos(t_data *table);
 t_bool			ph_init_philo(int ac, char *av[], t_data *table);
 
 /*
@@ -61,6 +62,7 @@ void			print_error(t_error_flag flag);
 /*
 ** file == srcs/ph_routine.c
 */
+t_bool			is_full(t_philo *ph);
 void			*philosophize(void *data);
 void			start_routine(t_data *t);
 void			ph_routine(t_data *table);
@@ -75,9 +77,18 @@ void			ph_join_thread(t_data *table);
 /*
 ** file == srcs/rt_eat.c
 */
-void			ph_take_fork(t_philo *ph);
+void			ph_take_l_fork(t_philo *ph);
+void			ph_take_r_fork(t_philo *ph);
 void			ph_drop_fork(t_philo *ph);
 void			rt_eat(t_data *table, t_philo *ph);
+
+/*
+** file == srcs/rt_fork_utils.c
+*/
+t_bool			fork_state(t_philo *ph);
+void			change_fork_state(t_philo *ph, t_bool value);
+void			wait_fork(t_philo *ph);
+void			ph_take_fork(t_philo *ph);
 
 /*
 ** file == srcs/rt_sleep_think.c

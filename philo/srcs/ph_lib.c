@@ -1,5 +1,4 @@
 #include "../headers/philosophers.h"
-#include <pthread.h>
 
 long	ft_atol(const char *nptr)
 {
